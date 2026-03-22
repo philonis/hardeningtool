@@ -8,7 +8,7 @@ description: OpenClaw 安全加固检查工具。检查 OpenClaw 配置是否满
 ## 快速开始
 
 ```bash
-bash ~/projects/hardeningtool/skills/hardening-check/scripts/check.sh
+python3 ~/projects/hardeningtool/skills/hardening-check/scripts/check.py
 ```
 
 ## 检查项目
@@ -49,11 +49,9 @@ bash ~/projects/hardeningtool/skills/hardening-check/scripts/check.sh --full
 
 ### 分类检查
 ```bash
-bash ~/projects/hardeningtool/skills/hardening-check/scripts/check.sh --config   # 基础配置
-bash ~/projects/hardeningtool/skills/hardening-check/scripts/check.sh --network  # 网络安全
-bash ~/projects/hardeningtool/skills/hardening-check/scripts/check.sh --process  # 进程权限
-bash ~/projects/hardeningtool/skills/hardening-check/scripts/check.sh --docker   # Docker隔离
-bash ~/projects/hardeningtool/skills/hardening-check/scripts/check.sh --skills   # Skills安全
+python3 ~/projects/hardeningtool/skills/hardening-check/scripts/check.py --config   # 基础配置
+python3 ~/projects/hardeningtool/skills/hardening-check/scripts/check.py --network  # 网络安全
+python3 ~/projects/hardeningtool/skills/hardening-check/scripts/check.py --json      # JSON输出
 ```
 
 ### 输出格式
