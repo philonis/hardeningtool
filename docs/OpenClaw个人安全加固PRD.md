@@ -271,4 +271,121 @@ openclaw security audit --fix
 
 ---
 
+## 8. 技术开发者安全加固
+
+> 适用于使用 OpenClaw 进行开发的技术人员
+
+### 8.1 基础配置加固
+
+**配置文件强密码**：
+```json
+{
+  "gateway": {
+    "auth": {
+      "mode": "token",
+      "token": "使用 32+ 位随机字符串"
+    }
+  }
+}
+```
+
+**配对策略**：
+- ✅ 设置为 `pairing`（需验证码）
+- ✅ 设置为 `allowlist`（白名单）
+- ❌ 禁止设置为 `open`
+
+### 8.2 网络暴露控制
+
+- ❌ 不将 Web 管理界面（18789）暴露到公网或局域网
+- ❌ 不使用 Tailscale、WireGuard 将端口映射到外网
+- ❌ 不使用 ngrok、frp 等内网穿透
+- ✅ 确保 `gateway.controlUi.allowInsecureAuth` 为 `false`
+
+### 8.3 运行环境隔离
+
+**方案一：Gateway 整体容器化**
+```bash
+docker run -d \
+  --name openclaw \
+  -p 127.0.0.1:18789:18789 \
+  -v ~/openclaw-data:/root/.openclaw \
+  openclaw/openclaw:latest
+```
+
+**方案二：工具执行沙箱隔离**
+```json
+{
+  "agents": {
+    "defaults": {
+      "sandbox": {
+        "scope": "agent",
+        "workspaceAccess": "rw"
+      }
+    }
+  }
+}
+```
+
+### 8.4 工具白名单
+
+```json
+{
+  "plugins": {
+    "entries": {
+      "shell": { "enabled": false },
+      "browser": { "enabled": false }
+    }
+  }
+}
+```
+
+### 8.5 文件系统只读挂载
+
+```bash
+# 敏感目录只读挂载
+docker run -v /etc:/etc:ro -v /usr:/usr:ro ...
+```
+
+### 8.6 安全审计
+
+```bash
+# 常规检查
+openclaw security audit
+
+# 深度探测
+openclaw security audit --deep
+
+# 自动修复
+openclaw security audit --fix
+```
+
+### 8.7 供应链安全
+
+**Skills 安装前审查**：
+```bash
+clawhub inspect --files <skill-name>
+```
+
+**危险信号识别**：
+- 诱导执行 `npm install`、`pip install`
+- 远程脚本下载
+- 发送 API keys 到外部
+
+**禁止事项清单**：
+```
+❌ 禁止执行：rm -rf /（无确认）
+❌ 禁止修改：认证/权限配置
+❌ 禁止发送：token/私钥/助记词到外部
+❌ 禁止执行：来路不明的"一键安装"命令
+```
+
+### 8.8 配置基线
+
+安装完成后立即：
+1. 建立配置文件哈希基线
+2. 限制核心配置文件访问权限
+3. 不将私钥交付给 Agent
+
+---
+
 *本文档根据国家互联网应急中心、中国网络空间安全协会联合发布的《OpenClaw 安全使用实践指南》整理。*
